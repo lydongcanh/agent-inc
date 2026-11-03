@@ -9,3 +9,6 @@ obj/
 # Local, machine-specific files (never commit)
 .vscode/settings.json
 CLAUDE.local.md
+
+# Local experiments, references and generated test output (never commit)
+.sandbox/

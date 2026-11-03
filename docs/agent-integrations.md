@@ -1,6 +1,6 @@
 # Agent integrations
 
-This guide shows how to connect Claude Code and Codex to Agent Inc. Both use the same forwarder, `agent-inc-hook`. You only change your agent's hook config. Your agents don't need to know anything about the game.
+This guide shows how to connect Claude Code and ChatGPT (formerly Codex) to Agent Inc. Both use the same forwarder, `agent-inc-hook`. You only change your agent's hook config. Your agents don't need to know anything about the game.
 
 > **Pre-alpha:** `agent-inc-hook` hasn't been released yet. The steps below are the planned setup. The game will also offer a one-click **Connect agents** screen that writes these configs for you, and makes a backup first.
 
@@ -18,7 +18,7 @@ These rules hold for every agent:
 - It reads one JSON payload from stdin. That is how both agents deliver hook data.
 - It **prints nothing** to stdout. This matters because, for some events, both agents add hook stdout to the model's context. That would cost tokens and could confuse the agent.
 - It **always exits `0`**. Exit code `2` would block the agent's action, so the forwarder never uses it.
-- It finishes in milliseconds. That's important for Codex `SessionEnd`, which runs synchronously with a 1-second time limit.
+- It finishes in milliseconds. That's important for ChatGPT's `SessionEnd`, which runs synchronously with a 1-second time limit.
 - If anything goes wrong (an unwritable disk, unexpected JSON), it gives up quietly. Your agent session is never affected.
 
 ## Claude Code
@@ -54,9 +54,9 @@ Notes:
 - No `matcher` is set, so the hooks fire for every tool.
 - Use `/hooks` inside Claude Code to check that the hooks are registered.
 
-## Codex CLI
+## ChatGPT (formerly Codex)
 
-Docs: [Codex hooks](https://learn.chatgpt.com/docs/hooks)
+Docs: [ChatGPT hooks](https://learn.chatgpt.com/docs/hooks)
 
 Add the hooks to your user file, `~/.codex/hooks.json` (or `$CODEX_HOME/hooks.json`). You can also add the same entries as `[hooks]` tables in `~/.codex/config.toml`. Use one place or the other, not both.
 
@@ -80,10 +80,10 @@ Add the hooks to your user file, `~/.codex/hooks.json` (or `$CODEX_HOME/hooks.js
 
 Notes:
 
-- **You must trust the hooks once.** Codex won't run new or changed hooks until you review them. Run `/hooks` in the Codex CLI (or open **Settings → Hooks** in the desktop app) and trust the Agent Inc entries. If the forwarder command changes later, you'll need to trust it again.
-- `SessionEnd` always runs synchronously in Codex, with a 1-second default timeout (3 seconds at most). That's why it has no `async` flag. The forwarder is fast enough for this.
+- **You must trust the hooks once.** ChatGPT won't run new or changed hooks until you review them. Open **Settings → Hooks** in the ChatGPT app (or run `/hooks` in the CLI) and trust the Agent Inc entries. If the forwarder command changes later, you'll need to trust it again.
+- `SessionEnd` always runs synchronously in ChatGPT, with a 1-second default timeout (3 seconds at most). That's why it has no `async` flag. The forwarder is fast enough for this.
 - Hooks are on by default. If you turned them off, remove `hooks = false` from the `[features]` section of `config.toml`.
-- Codex's older `notify` setting is not used. It only reports finished turns.
+- The older `notify` setting is not used. It only reports finished turns.
 
 ## Check that it works
 
@@ -102,7 +102,7 @@ Notes:
 
 | Symptom | Things to check |
 | --- | --- |
-| No session file appears | Is the forwarder path absolute and correct? Can you run `<AGENT_INC_HOOK> --version` in a terminal? Does `/hooks` in your agent list the hooks? For Codex, have you trusted them? |
+| No session file appears | Is the forwarder path absolute and correct? Can you run `<AGENT_INC_HOOK> --version` in a terminal? Does `/hooks` in your agent list the hooks? For ChatGPT, have you trusted them? |
 | The file appears but the game shows nothing | If you set `AGENT_INC_HOME`, do the game and the agent both see the same value? Is the file being written right now (`tail -f`)? |
 | A worker never leaves | The agent probably exited without `SessionEnd`, for example after a crash. The worker leaves automatically after the stale-session timeout (2 hours by default). |
 | Agent prints "hook error" | Please [open an issue](https://github.com/lydongcanh/agent-inc/issues) and include your OS and agent version. Don't paste raw hook payloads: they can contain your prompts and file paths. |

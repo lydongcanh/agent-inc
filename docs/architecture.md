@@ -17,11 +17,11 @@ This doc explains how Agent Inc turns agent activity into an animated office. It
 flowchart LR
     subgraph Agents
         CC[Claude Code]
-        CX[Codex CLI]
+        CX["ChatGPT (formerly Codex)"]
     end
     subgraph Forwarder["agent-inc-hook (CLI)"]
         A1[Claude Code adapter]
-        A2[Codex adapter]
+        A2[ChatGPT adapter]
         N[Normalize + redact]
     end
     S[("~/.agent-inc/sessions/<br/>one .jsonl per session")]
@@ -51,7 +51,7 @@ flowchart LR
 
 - **Works when the game is closed.** Events are buffered on disk, so opening the game later shows sessions that are still running.
 - **No ports.** No firewall prompts, no port clashes, and nothing listening on the network.
-- **One transport for every agent.** Claude Code supports HTTP hooks, but Codex only supports command hooks. A command that appends to a file works for both.
+- **One transport for every agent.** Claude Code supports HTTP hooks, but ChatGPT only supports command hooks. A command that appends to a file works for both.
 - **Easy to debug.** You can `tail -f` a session file and see exactly what the game sees.
 
 Each session gets its own file, so concurrent sessions never write to the same file.
@@ -89,6 +89,7 @@ Each line in a session file is one JSON object:
   "agent": null,
   "kind": "tool.start",
   "tool": "Bash",
+  "call": "toolu_01AbCdEfGhIjKlMnOpQrStUv",
   "category": "run",
   "project": "my-app",
   "hook": "PreToolUse"
@@ -99,11 +100,12 @@ Each line in a session file is one JSON object:
 | --- | --- | --- |
 | `v` | int | Schema version. It goes up only on breaking changes. |
 | `ts` | string | UTC timestamp (ISO 8601), set by the forwarder. |
-| `source` | string | `claude-code` or `codex`. |
+| `source` | string | `claude-code` or `codex` (ChatGPT). |
 | `session` | string | The agent's session ID. One session is one worker. |
 | `agent` | string \| null | Subagent ID, or `null` for the main agent. A subagent is shown as an intern. |
 | `kind` | string | The normalized event type (see the table below). |
 | `tool` | string \| null | Tool name for `tool.*` events, such as `Bash` or `Edit`. |
+| `call` | string \| null | Tool call ID (`tool_use_id`) for `tool.*` events. It links a tool's start and end. |
 | `category` | string \| null | Tool category: `read`, `edit`, `run`, `web`, `delegate` or `other`. |
 | `project` | string | Last folder name of the agent's working directory, used for room or team labels. The full path is never stored. |
 | `hook` | string | The original hook event name, kept for debugging. |
@@ -112,14 +114,14 @@ Readers must ignore fields they don't recognize. That lets new fields be added w
 
 ### Event kinds
 
-| `kind` | Claude Code hook | Codex hook | What you see in the office |
+| `kind` | Claude Code hook | ChatGPT hook | What you see in the office |
 | --- | --- | --- | --- |
-| `session.start` | `SessionStart` | `SessionStart` | A worker walks in and sits at a desk. |
+| `session.start` | `SessionStart` | `SessionStart` | Nothing yet. The worker walks in on its first `prompt` or `tool.*` event. |
 | `prompt` | `UserPromptSubmit` | `UserPromptSubmit` | The worker gets a task card and starts working. |
 | `tool.start` | `PreToolUse` | `PreToolUse` | An activity animation for the tool category (see below). |
 | `tool.end` | `PostToolUse` | `PostToolUse` | The activity finishes. |
 | `tool.error` | `PostToolUseFailure` | — | A short frustrated reaction. |
-| `attention` | `PermissionRequest`, `Notification` | `PermissionRequest` | The worker raises a hand and the desk lamp blinks. |
+| `attention` | `PermissionRequest`, `Notification` | `PermissionRequest`, or `PreToolUse` for the `request_permissions` tool | The worker raises a hand and the desk lamp blinks. |
 | `turn.end` | `Stop` | `Stop` | The worker leans back: done, waiting for you. |
 | `interrupt` | — | `Interrupt` | The worker stops abruptly. |
 | `subagent.start` | `SubagentStart` | `SubagentStart` | An intern shows up at the desk. |
@@ -137,18 +139,19 @@ Tool names are mapped to a small set of categories, and each category has its ow
 | `edit` | `Edit`, `Write`, `apply_patch` | Types fast at the desk |
 | `run` | `Bash` | Works at the terminal or server rack |
 | `web` | `WebFetch`, `WebSearch` | Looks at the big screen |
-| `delegate` | `Task`, `Agent` | Hands a folder to an intern |
+| `delegate` | `Task`, `Agent`, `collaborationspawn_agent` | Hands a folder to an intern |
 | `other` | MCP tools and anything else | Generic "busy" animation |
 
 ## Office state model
 
 The game rebuilds the office entirely from events, so it can be restarted at any time:
 
-- **Worker per session:** created on the first event for a session ID (not only on `session.start`, because the game may have missed it).
-- **Activity:** set by the latest `tool.start`, and cleared by `tool.end`, `tool.error` or `turn.end`.
+- **Worker per session:** appears on the session's first `prompt` or `tool.*` event. Sessions with neither, such as idle editor sessions, are never shown.
+- **Activity:** set by `tool.start`, and cleared by the `tool.end` or `tool.error` with the same `call`, or by `turn.end`. Async hooks can arrive out of order, so events are matched by `call`, not by arrival order.
+- **Interns:** Claude Code subagent tool calls carry `agent`, so interns show activity. ChatGPT subagents only send start and stop events.
 - **Needs attention:** set by `attention` and cleared by the next event from the same session.
 - **Stale sessions:** an agent may crash without sending `session.end`. If a session has had no events for 30 minutes, the worker goes idle. After 2 hours, the worker leaves. Both thresholds can be configured.
-- **Projects:** workers with the same `project` sit together.
+- **Projects:** a worker's `project` comes from its first event and doesn't change, even when the agent changes directory. Workers with the same `project` sit together.
 
 ## Future: talking back
 

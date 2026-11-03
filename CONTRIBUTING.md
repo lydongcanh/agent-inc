@@ -2,7 +2,7 @@
 
 Thanks for your interest! The project is in its design phase, so the most helpful contributions right now are feedback on the [docs](docs/) and ideas in [issues](https://github.com/lydongcanh/agent-inc/issues).
 
-> **License:** Agent Inc is source-available under the [PolyForm Strict License 1.0.0](LICENSE.md), not an open-source license. A contributor agreement for code contributions is coming soon. Until it's added, please open an issue before starting on a pull request.
+> **License:** Agent Inc is source-available (PolyForm Strict or PolyForm Internal Use, see [LICENSE.md](LICENSE.md)), not open source. A contributor agreement for code contributions is coming soon. Until it's added, please open an issue before starting on a pull request.
 
 ## Prerequisites
 

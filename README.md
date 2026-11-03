@@ -58,10 +58,10 @@ To build from source, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 
-Agent Inc is **source-available** under the [PolyForm Strict License 1.0.0](LICENSE.md):
+Agent Inc is **source-available**. You can choose either the PolyForm Strict or the PolyForm Internal Use license. See [LICENSE.md](LICENSE.md).
 
-- ✅ You may use it for free for any **noncommercial** purpose, such as personal use, hobby projects or study.
+- ✅ It's free to use, both at home and at work.
 - ❌ You may not redistribute it, sell it, or publish modified versions.
-- For any other use, including commercial use, please [open an issue](https://github.com/lydongcanh/agent-inc/issues) to ask.
+- For anything else, please [open an issue](https://github.com/lydongcanh/agent-inc/issues) to ask.
 
 Agent Inc is an independent fan project. It is not affiliated with or endorsed by Anthropic or OpenAI. "Claude" and "Codex" are trademarks of their respective owners.

@@ -7,16 +7,18 @@ The plan is in phases. Each phase should produce something usable before the nex
 - [x] Initialize the Godot project (Godot 4.7, .NET)
 - [x] Write the vision, architecture, integration and privacy docs
 - [x] Choose a license (PolyForm Strict or Internal Use, 1.0.0)
-- [ ] Add a contributor agreement
+- [ ] Verify real hook payloads against the event format (local only, never committed)
+- [ ] Technical decisions: repo layout, .NET version, forwarder approach
 - [ ] Choose an art direction (low-poly, voxel or stylized) and the asset sources
 
 ## Phase 1: Observer MVP
 
 Goal: open the game and see your real agents working.
 
-- [ ] `agent-inc-hook` forwarder with Claude Code and Codex adapters
+- [ ] `agent-inc-hook` forwarder with Claude Code and ChatGPT (formerly Codex) adapters
 - [ ] Session file writer, with ID sanitizing and retention cleanup
 - [ ] Session watcher and office state model in the game
+- [ ] Debug event list in the game (no 3D yet)
 - [ ] A single office room: one desk per session, with workers walking in and out
 - [ ] Basic animations: idle, working (one per tool category), needs attention, done
 - [ ] **Connect agents** / **Disconnect agents** screen that safely edits the hook configs
@@ -52,3 +54,4 @@ Any talk-back feature must be opt-in and must leave observe-only mode unchanged.
 - More agents (anything with command hooks)
 - Multi-machine offices (would need a network transport, so it is opt-in by definition)
 - Stats: busiest hours, most-used tools
+- Contributor agreement (needed before accepting outside code)

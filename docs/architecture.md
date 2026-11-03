@@ -60,6 +60,7 @@ Each session gets its own file, so concurrent sessions never write to the same f
 
 ```
 agent-inc/
+├── art/           # Blender scripts that generate the game's models
 ├── docs/
 ├── game/          # The Godot project (.NET 10, one C# project)
 ├── forwarder/     # agent-inc-hook (separate program, runs outside Godot)

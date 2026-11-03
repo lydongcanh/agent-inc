@@ -2,16 +2,17 @@
 
 The plan is in phases. Each phase should produce something usable before the next one starts. Scope may change, and anything not in a phase yet is just an idea.
 
-## Phase 0: Design (current)
+## Phase 0: Design
 
 - [x] Initialize the Godot project (Godot 4.7, .NET)
 - [x] Write the vision, architecture, integration and privacy docs
 - [x] Choose a license (PolyForm Strict or Internal Use, 1.0.0)
 - [x] Verify real hook payloads against the event format.
 - [x] Technical decisions: repo layout, .NET version, forwarder approach
-- [ ] Choose an art direction (low-poly, voxel or stylized) and the asset sources
+- [x] Style test
+- [x] Art direction and asset sources ([art-direction.md](art-direction.md))
 
-## Phase 1: Observer MVP
+## Phase 1: Observer MVP (current)
 
 Goal: open the game and see your real agents working.
 

@@ -10,7 +10,7 @@ Agent Inc watches tools that can see your code, your prompts and your terminal, 
 
 ## What the agents send to the hook
 
-Claude Code and Codex send each hook a JSON payload. Depending on the event, that payload can include your prompt text, tool inputs (shell commands, file contents being written), tool outputs, the agent's last message, your working directory and a path to the full session transcript.
+Claude Code and ChatGPT send each hook a JSON payload. Depending on the event, that payload can include your prompt text, tool inputs (shell commands, file contents being written), tool outputs, the agent's last message, your working directory and a path to the full session transcript.
 
 ## What Agent Inc keeps
 

@@ -41,7 +41,7 @@ flowchart LR
 
 | Component | Tech | Responsibility |
 | --- | --- | --- |
-| `agent-inc-hook` | Small .NET console app, compiled ahead of time for fast startup | Reads a hook payload from stdin, maps it to a normalized event, drops sensitive fields, appends one line to the session file, then exits `0` with no output. |
+| `agent-inc-hook` | .NET 10 console app, Native AOT (a single small file that starts in milliseconds; built per OS) | Reads a hook payload from stdin, maps it to a normalized event, drops sensitive fields, appends one line to the session file, then exits `0` with no output. |
 | Session files | JSON Lines (`.jsonl`) | A durable, append-only log, one file per agent session. They work whether or not the game is running. |
 | Session watcher | C# in Godot | Detects new or changed session files and reads only the newly appended lines. |
 | Office state model | C# in Godot | Turns the event stream into worker states: who is in the office, what each worker is doing, and who needs attention. |
@@ -55,6 +55,33 @@ flowchart LR
 - **Easy to debug.** You can `tail -f` a session file and see exactly what the game sees.
 
 Each session gets its own file, so concurrent sessions never write to the same file.
+
+## Code layout
+
+```
+agent-inc/
+├── docs/
+├── game/          # The Godot project (.NET 10, one C# project)
+├── forwarder/     # agent-inc-hook (separate program, runs outside Godot)
+└── tests/
+```
+
+Godot compiles every `.cs` file under its project folder, and `.gdignore` doesn't change that, so non-game code lives outside `game/`. Inside `game/`, folders Godot doesn't need get a `.gdignore`.
+
+```
+game/
+├── assets/
+├── scenes/          # .tscn files
+└── scripts/
+    ├── domain/      # Data: sessions, workers, office state, the event format
+    ├── events/      # Event bus and its messages
+    └── systems/     # All logic, including scene node scripts
+```
+
+- **Systems never reference each other.** They only publish and subscribe to messages on the event bus, and read or write domain data.
+- **The bus is a typed C# bus** (`Publish<T>` / `Subscribe<T>`). It delivers messages on the main thread; work on background threads, such as file watching, is queued onto the main thread.
+- **Bus messages are not hook events.** Agent hook events are domain data. The bus only carries game messages, such as `WorkerAppeared` or `ToolStarted`.
+- **One event format definition.** The forwarder compiles the event format file from `game/scripts/domain/` directly, so that file must not use Godot types.
 
 ## Data directory
 

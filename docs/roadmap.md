@@ -8,13 +8,14 @@ The plan is in phases. Each phase should produce something usable before the nex
 - [x] Write the vision, architecture, integration and privacy docs
 - [x] Choose a license (PolyForm Strict or Internal Use, 1.0.0)
 - [x] Verify real hook payloads against the event format.
-- [ ] Technical decisions: repo layout, .NET version, forwarder approach
+- [x] Technical decisions: repo layout, .NET version, forwarder approach
 - [ ] Choose an art direction (low-poly, voxel or stylized) and the asset sources
 
 ## Phase 1: Observer MVP
 
 Goal: open the game and see your real agents working.
 
+- [ ] Set up the code layout (move the Godot project to `game/`)
 - [ ] `agent-inc-hook` forwarder with Claude Code and ChatGPT (formerly Codex) adapters
 - [ ] Session file writer, with ID sanitizing and retention cleanup
 - [ ] Session watcher and office state model in the game

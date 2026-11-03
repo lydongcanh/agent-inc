@@ -11,7 +11,7 @@ You only need these to build from source. Players using release builds don't nee
 | Tool | Version | Notes |
 | --- | --- | --- |
 | [Godot Engine, **.NET** edition](https://godotengine.org/download) | 4.7 | You must use the .NET edition; the standard edition can't open C# projects. |
-| [.NET SDK](https://dotnet.microsoft.com/download) | 8.0 or newer | Builds the game scripts and the forwarder. |
+| [.NET SDK](https://dotnet.microsoft.com/download) | 10.0 | Builds the game and the forwarder. |
 | Git | any | |
 
 To build the forwarder ahead of time (Native AOT), you also need your platform's native toolchain: Xcode Command Line Tools on macOS, the "Desktop development with C++" workload on Windows, or `clang` on Linux.
@@ -23,36 +23,23 @@ git clone https://github.com/lydongcanh/agent-inc.git
 cd agent-inc
 ```
 
-Open the folder in Godot (.NET), then press **F5** to run.
+Open the `game/` folder in Godot (.NET), then press **F5** to run.
 
 ### Testing without a real agent
 
-You don't need to run Claude Code or Codex to work on the game. Write fake events to a session file and the game will pick them up:
+You don't need to run Claude Code or ChatGPT to work on the game. Write fake events to a session file and the game will pick them up:
 
 ```sh
 mkdir -p ~/.agent-inc/sessions/claude-code
-echo '{"v":1,"ts":"2026-11-03T15:04:05.123Z","source":"claude-code","session":"demo-1","agent":null,"kind":"tool.start","tool":"Bash","category":"run","project":"demo","hook":"PreToolUse"}' \
+echo '{"v":1,"ts":"2026-11-03T15:04:05.123Z","source":"claude-code","session":"demo-1","agent":null,"kind":"tool.start","tool":"Bash","call":"demo-call-1","category":"run","project":"demo","hook":"PreToolUse"}' \
   >> ~/.agent-inc/sessions/claude-code/demo-1.jsonl
 ```
 
 A replay script for sample sessions is planned.
 
-## Project layout (planned)
+## Project layout
 
-```
-agent-inc/
-├── project.godot
-├── scenes/           # Godot scenes (.tscn): office, worker, UI, mini-games
-├── scripts/          # C# game code
-│   ├── Events/       # Event model, session watcher
-│   ├── Office/       # Office state model, workers
-│   └── UI/
-├── assets/           # Models, textures, audio (with license info for each source)
-├── tools/
-│   └── hook-forwarder/   # agent-inc-hook .NET console app
-├── tests/
-└── docs/
-```
+See [Architecture: Code layout](docs/architecture.md#code-layout).
 
 ## Conventions
 
